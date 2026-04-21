@@ -1,7 +1,6 @@
 const axios = require("axios");
 
 export default async function handler(req, res) {
-    // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -18,7 +17,7 @@ export default async function handler(req, res) {
         });
     };
 
-    // Home route
+    // ہوم پیج
     if (req.url === '/' || req.url === '') {
         return res.json({
             message: "YouTube Video Downloader API",
@@ -28,14 +27,12 @@ export default async function handler(req, res) {
         });
     }
 
-    // Get URL from query (GET) or body (POST)
     const url = req.query.url || (req.body && req.body.url);
 
     if (!url) {
         return sendError(400, "URL parameter is required");
     }
 
-    // Validate YouTube URL
     const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
     if (!youtubeRegex.test(url)) {
         return sendError(400, "Invalid YouTube URL");
@@ -67,7 +64,6 @@ export default async function handler(req, res) {
         }
 
         const video = data.data;
-
         const videos = [];
         const audios = [];
 
@@ -78,7 +74,6 @@ export default async function handler(req, res) {
                 url: r.download_url,
                 sizeMB: +(r.size / 1024 / 1024).toFixed(2),
             };
-
             if (r.type === "video") videos.push(item);
             if (r.type === "audio") audios.push(item);
         });
@@ -95,14 +90,12 @@ export default async function handler(req, res) {
             telegram: "@FREEHACKS95"
         };
 
-        // Set JSON response headers
         res.setHeader('Content-Type', 'application/json');
         res.setHeader('Content-Disposition', 'attachment; filename="yt.json"');
 
         return res.status(200).json(responsePayload);
 
     } catch (err) {
-        console.error("Vidssave scrape failed:", err.message);
         return sendError(500, "Failed to fetch video data");
     }
 }
